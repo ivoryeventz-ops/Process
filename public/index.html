@@ -678,6 +678,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--gold); backgrou
 
 .qty .rate-input { width: 92px; }
 .qty .qty-input { width: 70px; }
+.qty select { padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font: inherit; font-weight: 600; margin-left: 4px; }
 .qty .rate-wrap { margin-left: 10px; white-space: nowrap; }
 .subline { display: flex; justify-content: space-between; font-size: 0.84rem; color: var(--mute); padding: 3px 0; }
 .btn.secondary { background: #fff; color: var(--gold-deep); border: 1px solid var(--gold); box-shadow: none; }
@@ -1241,6 +1242,7 @@ input[type=number] { font: inherit; }
         <small>White luxury sedan (BMW also available in dark green)</small>
         <span class="price">&#8377;10,500</span>
       </label>
+      <div class="qty">Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
     </div>
     <div class="item">
       <label>
@@ -1249,6 +1251,7 @@ input[type=number] { font: inherit; }
         <small>White luxury sedan</small>
         <span class="price">&#8377;12,500</span>
       </label>
+      <div class="qty">Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
     </div>
     <div class="item">
       <label>
@@ -1257,6 +1260,7 @@ input[type=number] { font: inherit; }
         <small>White latest model sedan</small>
         <span class="price">&#8377;18,500</span>
       </label>
+      <div class="qty">Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
     </div>
     <div class="item">
       <label>
@@ -1265,6 +1269,7 @@ input[type=number] { font: inherit; }
         <small>White flagship VIP sedan</small>
         <span class="price">&#8377;20,500</span>
       </label>
+      <div class="qty">Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
     </div>
     <div class="item">
       <label>
@@ -1273,6 +1278,7 @@ input[type=number] { font: inherit; }
         <small>Black or white luxury SUV</small>
         <span class="price">&#8377;45,000</span>
       </label>
+      <div class="qty">Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
     </div>
   </div>
 
@@ -1735,6 +1741,8 @@ input[type=number] { font: inherit; }
       } else {
         var qty = getQty(card), rate = getRate(input, card);
         var name = input.getAttribute('data-name');
+        var who = card.querySelector('.who-select');
+        if (who && who.value) name += ' (' + who.value + ')';
         var stage = input.getAttribute('data-selected-stage');
         row = { name: name, label: name + (stage ? " (" + stage + ")" : ""), qty: qty, rate: rate, sub: rate * qty,
                 hasQty: !!card.querySelector('.qty-input'), sublist: null };
@@ -1807,6 +1815,7 @@ input[type=number] { font: inherit; }
     });
   });
   each(document.querySelectorAll('input[type="checkbox"]'), function (cb) { cb.addEventListener('change', render); });
+  each(document.querySelectorAll('.who-select'), function (sel) { sel.addEventListener('change', render); });
   each(document.querySelectorAll('.qty-input, .rate-input'), function (q) {
     q.addEventListener('input', render);
     q.addEventListener('change', function () {
