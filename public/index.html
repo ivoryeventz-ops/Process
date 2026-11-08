@@ -1331,12 +1331,25 @@ input[type=number] { font: inherit; }
   <div class="grid">
     <div class="item">
       <label>
-        <input type="checkbox" data-name="Custom raised wooden stage platform for live band" data-price="0" data-rate-editable="true">
+        <input type="checkbox" data-name="Custom raised wooden stage platform for live band" data-price="5000" data-rate-editable="true">
         <b>Custom raised wooden stage platform</b>
         <small>Raised wooden platform for the live band</small>
-        <span class="price">Rate &mdash; enter below</span>
+        <span class="price">&#8377;5,000 (editable)</span>
       </label>
-      <div class="qty">Rate &#8377; <input type="number" min="0" value="" placeholder="0" class="rate-input" inputmode="numeric" aria-label="Platform rate"></div>
+      <div class="qty">Rate &#8377; <input type="number" min="0" value="5000" class="rate-input" inputmode="numeric" aria-label="Platform rate"></div>
+    </div>
+  </div>
+
+  <h2>16 &middot; Bride's wedding car decoration</h2>
+  <div class="grid">
+    <div class="item">
+      <label>
+        <input type="checkbox" data-name="Wedding car decoration - Bride" data-price="3000" data-rate-editable="true">
+        <b>Bride's wedding car decoration</b>
+        <small>Decoration for the bride's wedding car</small>
+        <span class="price">&#8377;3,000 (editable)</span>
+      </label>
+      <div class="qty">Rate &#8377; <input type="number" min="0" value="3000" class="rate-input" inputmode="numeric" aria-label="Bride car decoration rate"></div>
     </div>
   </div>
 
@@ -1668,7 +1681,7 @@ input[type=number] { font: inherit; }
   var RT_MIN_TABLES = 6;
   var RT_RATE_PER_TABLE = 3150;
   var SEC_GROUP = {1:'decor',2:'decor',3:'decor',4:'decor',5:'decor',6:'decor',7:'decor',8:'decor',
-                   9:'vendor',10:'vendor',11:'vendor',12:'decor',13:'vendor',14:'vendor',15:'decor'};
+                   9:'vendor',10:'vendor',11:'vendor',12:'vendor',13:'vendor',14:'vendor',15:'decor',16:'decor'};
   var lastCheckedRadio = {};
   var lastSel = null;
 
