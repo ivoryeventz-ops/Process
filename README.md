@@ -2,7 +2,7 @@
 
 Internal tool. `index.html` is the packages page with extra options (generator, venue table/chair covers, pagoda/tent, live-band platform). Tick items, the total updates, then fill in client name, event date, venue and quote # and press **Create quote** to get a client quote page (HTML file, same layout as the sample quotes).
 
-Host it as a static site (e.g. Cloudflare Pages) from the repo root. Images are in `upload-1-images/` and `upload-2-thumbs/`.
+The site lives in `public/` (page, logo and images in `upload-1-images/` and `upload-2-thumbs/`). `wrangler.jsonc` tells Cloudflare Workers to serve that folder as a static site. `apps-script/` and this README are not published.
 
 Editable rates: table covers, chair covers (default ₹16), pagoda/tent (default ₹7,000) and the band platform. Table covers and the platform have no default rate; enter one before creating the quote.
 
@@ -13,6 +13,6 @@ Out of the box, **Create Google Sheet** copies the data and opens a blank sheet;
 For one-click sheet creation:
 1. Go to https://script.google.com, create a project, paste `apps-script/Code.gs`, and set `SECRET` to a private word.
 2. Deploy → New deployment → Web app → Execute as **Me**, access **Anyone** → copy the web-app URL.
-3. In `index.html`, set `SHEETS_WEBAPP_URL` (the URL) and `SHEETS_KEY` (same secret). Redeploy the site.
+3. In `public/index.html`, set `SHEETS_WEBAPP_URL` (the URL) and `SHEETS_KEY` (same secret). Redeploy the site.
 
 Sheets are created in the Drive of the account that deployed the script.
