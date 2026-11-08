@@ -1359,6 +1359,7 @@ input[type=number] { font: inherit; }
   <h3>Your selection</h3>
   <ul id="lines"><li id="emptyLine"><span>Nothing selected yet</span><span></span></li></ul>
   <div class="subline"><span>Stage decor &amp; misc</span><span id="tdecor">&#8377;0</span></div>
+  <div class="subline"><span>Bride's car decoration</span><span id="tcar">&#8377;0</span></div>
   <div class="subline"><span>Outside vendors</span><span id="tvendor">&#8377;0</span></div>
   <div class="total"><span>Estimated total</span><span id="tot">&#8377;0</span></div>
   <p class="note" id="tanote"></p>
@@ -1681,7 +1682,7 @@ input[type=number] { font: inherit; }
   var RT_MIN_TABLES = 6;
   var RT_RATE_PER_TABLE = 3150;
   var SEC_GROUP = {1:'decor',2:'decor',3:'decor',4:'decor',5:'decor',6:'decor',7:'decor',8:'decor',
-                   9:'vendor',10:'vendor',11:'vendor',12:'vendor',13:'vendor',14:'vendor',15:'decor',16:'decor'};
+                   9:'vendor',10:'vendor',11:'vendor',12:'vendor',13:'vendor',14:'vendor',15:'decor',16:'bridecar'};
   var lastCheckedRadio = {};
   var lastSel = null;
 
@@ -1712,7 +1713,7 @@ input[type=number] { font: inherit; }
   }
 
   function collectSelection() {
-    var s = { rows: [], total: 0, decor: 0, vendor: 0, pkg: null, pkgImg: '', hasTA: false, hasFR: false, zero: [] };
+    var s = { rows: [], total: 0, decor: 0, vendor: 0, car: 0, pkg: null, pkgImg: '', hasTA: false, hasFR: false, zero: [] };
     each(document.querySelectorAll('.item input[type="radio"], .item input[type="checkbox"]'), function (input) {
       var card = input.closest('.item');
       if (!input.checked) { card.classList.remove('selected'); return; }
@@ -1754,7 +1755,7 @@ input[type=number] { font: inherit; }
       row.group = group; row.sec = sec; row.isPkg = (input.name === 'pkg');
       s.rows.push(row);
       s.total += row.sub;
-      if (group === 'vendor') s.vendor += row.sub; else s.decor += row.sub;
+      if (group === 'vendor') s.vendor += row.sub; else if (group === 'bridecar') s.car += row.sub; else s.decor += row.sub;
     });
     return s;
   }
@@ -1778,6 +1779,7 @@ input[type=number] { font: inherit; }
       addLine(list, r.label + (r.qty > 1 && !r.hasQtyShown && r.label.indexOf(' tables +') < 0 ? ' × ' + r.qty : ''), r.sub);
     });
     document.getElementById('tdecor').textContent = formatMoney(s.decor);
+    document.getElementById('tcar').textContent = formatMoney(s.car);
     document.getElementById('tvendor').textContent = formatMoney(s.vendor);
     document.getElementById('tot').textContent = formatMoney(s.total);
     var note = '';
@@ -1875,6 +1877,7 @@ input[type=number] { font: inherit; }
     var hasAnchor = s.rows.some(function (r) { return r.name === 'Professional anchor or MC'; });
     var decorRows = s.rows.filter(function (r) { return r.group === 'decor' && !r.isPkg; });
     var vendorRows = s.rows.filter(function (r) { return r.group === 'vendor'; });
+    var carRows = s.rows.filter(function (r) { return r.group === 'bridecar'; });
     var h = [];
     h.push('<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8" />\n<meta name="viewport" content="width=device-width, initial-scale=1.0" />');
     h.push('<meta name="robots" content="noindex" />');
@@ -1917,6 +1920,11 @@ input[type=number] { font: inherit; }
     if (decorRows.length || s.pkg) {
       h.push('<div class="total-row-card"><div class="total-row-title">Total for Stage Decoration &amp; Misc</div><div class="total-row-amount">' + money(s.decor) + '</div></div>');
     }
+    if (carRows.length) {
+      h.push('<div class="section-card"><div class="line-item-group">' + carRows.map(function (r) {
+        return '<div class="line-item-box"><div class="line-item-info"><div class="line-item-name">' + esc(lineName(r)) + '</div></div><div class="line-item-price">' + money(r.sub) + '</div></div>';
+      }).join('') + '</div></div>');
+    }
     if (vendorRows.length) {
       h.push('<div class="section-card"><div class="section-header"><span class="section-title">Outside Vendors</span></div><div class="line-item-group">'
         + vendorRows.map(function (r) {
@@ -1926,7 +1934,8 @@ input[type=number] { font: inherit; }
         }).join('') + '</div></div>');
       h.push('<div class="total-row-card"><div class="total-row-title">Total for outside vendors</div><div class="total-row-amount">' + money(s.vendor) + '</div></div>');
     }
-    if ((decorRows.length || s.pkg) && vendorRows.length) {
+    var nGroups = ((decorRows.length || s.pkg) ? 1 : 0) + (carRows.length ? 1 : 0) + (vendorRows.length ? 1 : 0);
+    if (nGroups > 1) {
       h.push('<div class="total-row-card grand"><div class="total-row-title">Grand Total</div><div class="total-row-amount">' + money(s.total) + '</div></div>');
     }
     h.push(complimentary(isPkg1, hasAnchor));
@@ -1990,8 +1999,9 @@ input[type=number] { font: inherit; }
       return t;
     }
     var d = block('decor', 'Decor', 'Total - Stage Decoration & Misc');
+    var c = block('bridecar', 'Bride car', 'Total - Bride car decoration');
     var v = block('vendor', 'Outside vendor', 'Total - Outside vendors');
-    var t = [d, v].filter(Boolean).map(function (x) { return 'E' + x; }).join('+');
+    var t = [d, c, v].filter(Boolean).map(function (x) { return 'E' + x; }).join('+');
     R.push(['', 'GRAND TOTAL', '', '', '=' + t]);
     return R;
   }
