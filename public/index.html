@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#b08d57">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ivory Quotes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Ivory Events &mdash; Quote Builder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1983,6 +1991,14 @@ input[type=number] { font: inherit; }
       out.appendChild(document.createElement('br'));
       addOutLink('Open quote preview', url, null);
       addOutLink('Download ' + fname, url, fname);
+      try {
+        var file = new File([html], fname, { type: 'text/html' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          var sb = document.createElement('a'); sb.href = '#'; sb.textContent = 'Share quote file\u2026';
+          sb.addEventListener('click', function (ev) { ev.preventDefault(); navigator.share({ files: [file], title: 'Decor Quote - ' + info.name }).catch(function () {}); });
+          out.appendChild(sb); out.appendChild(document.createElement('br'));
+        }
+      } catch (e) {}
     });
   });
 
@@ -2138,6 +2154,8 @@ input[type=number] { font: inherit; }
   // Default quote # = today as YYMMDD (editable)
   var now = new Date();
   document.getElementById('qn').value = String(now.getFullYear()).slice(2) + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2);
+
+  if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
 
   render();
 })();
