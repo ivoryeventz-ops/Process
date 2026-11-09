@@ -1,5 +1,5 @@
 // Ivory Quotes service worker: page is network-first (so updates arrive), images are cached after first view.
-const V = 'ivory-quotes-v1';
+const V = 'ivory-quotes-v2';
 const SHELL = ['./', 'index.html', 'logo.png', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
