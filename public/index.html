@@ -693,6 +693,8 @@ input:focus, textarea:focus { outline: none; border-color: var(--gold); backgrou
 @media (hover: hover) { .btn.secondary:hover { background: var(--gold-tint); transform: translateY(-1px); box-shadow: none; } }
 .out { font-size: 0.84rem; margin: 8px 0 0; line-height: 1.7; }
 .out a { color: var(--gold-deep); font-weight: 600; }
+.keybox { margin-top: 14px; font-size: 0.84rem; }
+.keybox summary { cursor: pointer; font-weight: 600; color: var(--gold-deep); }
 .divider { border: 0; border-top: 1px solid var(--line); margin: 14px 0 8px; }
 .field-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute); font-weight: 600; margin: 8px 0 0; display: block; }
 input[type=number] { font: inherit; }
@@ -1392,6 +1394,15 @@ input[type=number] { font: inherit; }
   <button type="button" class="btn secondary" id="mkSheet">Create Google Sheet</button>
   <p class="note warn" id="gomsg" role="status"></p>
   <div class="out" id="out"></div>
+
+  <details class="keybox" id="keybox">
+    <summary>Publishing key (one-time setup on each device)</summary>
+    <p class="note">Paste the GitHub access key once. It is saved only on this device and lets the page publish quotes to the client site. See README for how to create it.</p>
+    <input type="password" id="ghkey" placeholder="github_pat_..." autocomplete="off" autocapitalize="off" spellcheck="false">
+    <button type="button" class="btn secondary" id="saveKey">Save key</button>
+    <button type="button" class="btn secondary" id="clearKey">Remove key</button>
+    <p class="note" id="keymsg" role="status"></p>
+  </details>
 </aside>
 
 </main>
@@ -1692,6 +1703,8 @@ input[type=number] { font: inherit; }
   var QUOTE_BASE_URL = "https://ivory-packages.pages.dev";   // used for link-preview tags in the quote file
   var SHEETS_WEBAPP_URL = "";   // paste your Apps Script web-app URL here (see README) to create sheets in one click
   var SHEETS_KEY = "";          // same secret key you set in apps-script/Code.gs
+  var GH_REPO = "ivoryeventz-ops/ivory-packages";   // repo that hosts the client quotes
+  var GH_BRANCH = "main";
   var CLAUDE_CHAT_URL = "https://claude.ai/new";   // paste the link of your Ivory Events chat with Claude here so "Send quote" opens that chat
   // -----------------------------------------------------------------------
   var RT_MIN_TABLES = 6;
@@ -1961,6 +1974,37 @@ input[type=number] { font: inherit; }
     return h.join('\n');
   }
 
+  function getKey() { try { return localStorage.getItem('ivoryGhKey') || ''; } catch (e) { return ''; } }
+  function putKey(v) { try { if (v) localStorage.setItem('ivoryGhKey', v); else localStorage.removeItem('ivoryGhKey'); return true; } catch (e) { return false; } }
+  function toB64(str) {
+    var bytes = new TextEncoder().encode(str), bin = '', n = 0x8000;
+    for (var i = 0; i < bytes.length; i += n) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + n));
+    return btoa(bin);
+  }
+  function ghError(r) {
+    return r.json().catch(function () { return {}; }).then(function (j) {
+      var m = (j && j.message) || ('HTTP ' + r.status);
+      if (r.status === 401) m = 'GitHub rejected the key (wrong or expired). Replace it under "Publishing key".';
+      else if (r.status === 403 || r.status === 404) m = 'The key has no write access to ' + GH_REPO + ' (' + m + ').';
+      return new Error(m);
+    });
+  }
+  function publishQuote(html, folder, qfile) {
+    var key = getKey();
+    if (!key) return Promise.reject(new Error('NOKEY'));
+    var api = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + encodeURIComponent(folder) + '/' + encodeURIComponent(qfile) + '.html';
+    var hdr = { Authorization: 'Bearer ' + key, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+    return fetch(api + '?ref=' + encodeURIComponent(GH_BRANCH), { headers: hdr }).then(function (r) {
+      if (r.status === 200) return r.json().then(function (j) { return { sha: j.sha }; });
+      if (r.status === 404) return {};
+      return ghError(r).then(function (e) { throw e; });
+    }).then(function (ex) {
+      if (ex.sha && !confirm('A quote ' + folder + '/' + qfile + '.html already exists. Replace it with this one?')) throw new Error('Cancelled - nothing was changed.');
+      var body = { message: (ex.sha ? 'Update' : 'Add') + ' quote ' + folder + '/' + qfile, content: toB64(html), branch: GH_BRANCH };
+      if (ex.sha) body.sha = ex.sha;
+      return fetch(api, { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, hdr), body: JSON.stringify(body) });
+    }).then(function (r) { if (!r.ok) return ghError(r).then(function (e) { throw e; }); return r.json(); });
+  }
   function folderName(n) { return String(n).trim().replace(/\s+/g, '-').replace(/[^A-Za-z0-9_-]/g, '') || 'Client'; }
   function safeName(t) { return String(t).replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'quote'; }
   var out = document.getElementById('out');
@@ -1998,7 +2042,7 @@ input[type=number] { font: inherit; }
       var msg = 'Please publish this quote to ivoryeventz-ops/ivory-packages as ' + folder + '/' + qfile + '.html (create the folder if it does not exist) and give me the client link. Client: ' + info.name + ', event date: ' + fmtDate(info.date) + ', quote #' + info.quote + '. Expected link: ' + clientLink;
       var up = document.createElement('div');
       var send = document.createElement('button');
-      send.type = 'button'; send.className = 'btn'; send.textContent = 'Send quote to Claude';
+      send.type = 'button'; send.className = 'btn secondary'; send.textContent = 'Or send quote to Claude';
       var sendMsg = document.createElement('p'); sendMsg.className = 'note'; sendMsg.setAttribute('role', 'status');
       send.addEventListener('click', function () {
         var file = null;
@@ -2019,7 +2063,28 @@ input[type=number] { font: inherit; }
         else finish(false);
       });
       var linkP = document.createElement('p'); linkP.className = 'note'; linkP.textContent = 'Client link after publishing: ' + clientLink;
-      up.appendChild(send); up.appendChild(sendMsg); up.appendChild(linkP); out.appendChild(up);
+      var pub = document.createElement('button');
+      pub.type = 'button'; pub.className = 'btn'; pub.textContent = 'Publish quote & get client link';
+      var pubMsg = document.createElement('div'); pubMsg.className = 'out'; pubMsg.setAttribute('role', 'status');
+      pub.addEventListener('click', function () {
+        pub.disabled = true; pubMsg.textContent = 'Publishing\u2026';
+        publishQuote(html, folder, qfile).then(function () {
+          pubMsg.innerHTML = '';
+          pubMsg.appendChild(document.createTextNode('Published. The link goes live in about a minute:'));
+          pubMsg.appendChild(document.createElement('br'));
+          var a1 = document.createElement('a'); a1.href = clientLink; a1.target = '_blank'; a1.rel = 'noopener'; a1.textContent = clientLink;
+          pubMsg.appendChild(a1); pubMsg.appendChild(document.createElement('br'));
+          var wa = 'Hello ' + info.name + ', please find your decor quote for ' + fmtDate(info.date) + ' here: ' + clientLink;
+          var a2 = document.createElement('a'); a2.href = 'https://wa.me/?text=' + encodeURIComponent(wa); a2.target = '_blank'; a2.rel = 'noopener'; a2.textContent = 'Send on WhatsApp';
+          pubMsg.appendChild(a2);
+          pub.textContent = 'Published'; 
+        }).catch(function (e) {
+          pub.disabled = false;
+          if (e && e.message === 'NOKEY') { pubMsg.textContent = 'Add your publishing key first (see "Publishing key" below), then press publish again.'; var kb = document.getElementById('keybox'); kb.open = true; kb.scrollIntoView({ block: 'nearest' }); }
+          else pubMsg.textContent = 'Could not publish: ' + ((e && e.message) || 'network error') + ' You can still use "Or send quote to Claude".';
+        });
+      });
+      up.appendChild(pub); up.appendChild(pubMsg); up.appendChild(send); up.appendChild(sendMsg); up.appendChild(linkP); out.appendChild(up);
     });
   });
 
@@ -2175,6 +2240,16 @@ input[type=number] { font: inherit; }
   // Default quote # = today as YYMMDD (editable)
   var now = new Date();
   document.getElementById('qn').value = String(now.getFullYear()).slice(2) + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2);
+
+  var keyMsg = document.getElementById('keymsg');
+  if (getKey()) keyMsg.textContent = 'A key is saved on this device.';
+  document.getElementById('saveKey').addEventListener('click', function () {
+    var v = document.getElementById('ghkey').value.trim();
+    if (!v) { keyMsg.textContent = 'Paste the key first.'; return; }
+    keyMsg.textContent = putKey(v) ? 'Key saved on this device.' : 'This browser blocked saving. Try a normal (non-private) window.';
+    document.getElementById('ghkey').value = '';
+  });
+  document.getElementById('clearKey').addEventListener('click', function () { putKey(''); keyMsg.textContent = 'Key removed from this device.'; });
 
   if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
 

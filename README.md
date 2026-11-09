@@ -16,3 +16,16 @@ For one-click sheet creation:
 3. In `public/index.html`, set `SHEETS_WEBAPP_URL` (the URL) and `SHEETS_KEY` (same secret). Redeploy the site.
 
 Sheets are created in the Drive of the account that deployed the script.
+
+## Publishing quotes to clients (one tap)
+
+After **Create quote**, press **Publish quote & get client link**. The page saves the quote to `ivoryeventz-ops/ivory-packages` as `ClientName/YYMMDD.html` (spaces in names become hyphens) and shows the client link, e.g. `https://ivory-packages.pages.dev/Rebecca/261103`, with a **Send on WhatsApp** link. The link goes live about a minute later, after Cloudflare redeploys. If the same client/quote # already exists, it asks before replacing it.
+
+One-time setup on each phone/computer (the key is saved only in that browser, never in the code or the repo):
+1. On GitHub: profile picture → Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token.
+2. Name it "Ivory quote publisher", choose an expiry (up to 1 year), **Repository access: Only select repositories → ivory-packages**, **Permissions → Contents: Read and write**. Generate and copy the key (`github_pat_...`).
+3. In the app, open **Publishing key** (bottom of the sidebar), paste the key and press **Save key**.
+
+When the key expires, GitHub rejects it and the page says so; create a new one and save it again. To stop a device publishing, press **Remove key**, or delete the token on GitHub (this stops every device).
+
+"Or send quote to Claude" remains as a fallback and prepares the file and a message for Claude.
