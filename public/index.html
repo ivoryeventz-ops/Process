@@ -1692,6 +1692,7 @@ input[type=number] { font: inherit; }
   var QUOTE_BASE_URL = "https://ivory-packages.pages.dev";   // used for link-preview tags in the quote file
   var SHEETS_WEBAPP_URL = "";   // paste your Apps Script web-app URL here (see README) to create sheets in one click
   var SHEETS_KEY = "";          // same secret key you set in apps-script/Code.gs
+  var CLAUDE_CHAT_URL = "https://claude.ai/new";   // paste the link of your Ivory Events chat with Claude here so "Send quote" opens that chat
   // -----------------------------------------------------------------------
   var RT_MIN_TABLES = 6;
   var RT_RATE_PER_TABLE = 3150;
@@ -1902,7 +1903,7 @@ input[type=number] { font: inherit; }
     h.push('<meta property="og:type" content="website" />\n<meta property="og:site_name" content="Ivory Events" />');
     h.push('<meta property="og:title" content="' + esc(title) + '" />');
     h.push('<meta property="og:description" content="' + esc('Ivory Events wedding decor quote - ' + dateStr + ', ' + info.venue) + '" />');
-    h.push('<meta property="og:url" content="' + esc(QUOTE_BASE_URL + '/' + encodeURIComponent(info.name) + '/' + encodeURIComponent(info.quote)) + '" />');
+    h.push('<meta property="og:url" content="' + esc(QUOTE_BASE_URL + '/' + folderName(info.name) + '/' + safeName(info.quote)) + '" />');
     h.push('<meta property="og:image" content="' + esc(QUOTE_BASE_URL + '/ivory-logo.jpg') + '" />\n<meta property="og:image:alt" content="Ivory Events logo" />');
     h.push('<meta name="twitter:card" content="summary" />\n<meta name="twitter:image" content="' + esc(QUOTE_BASE_URL + '/ivory-logo.jpg') + '" />');
     h.push('<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>');
@@ -1960,6 +1961,7 @@ input[type=number] { font: inherit; }
     return h.join('\n');
   }
 
+  function folderName(n) { return String(n).trim().replace(/\s+/g, '-').replace(/[^A-Za-z0-9_-]/g, '') || 'Client'; }
   function safeName(t) { return String(t).replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'quote'; }
   var out = document.getElementById('out');
 
@@ -1991,14 +1993,33 @@ input[type=number] { font: inherit; }
       out.appendChild(document.createElement('br'));
       addOutLink('Open quote preview', url, null);
       addOutLink('Download ' + fname, url, fname);
-      try {
-        var file = new File([html], fname, { type: 'text/html' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          var sb = document.createElement('a'); sb.href = '#'; sb.textContent = 'Share quote file\u2026';
-          sb.addEventListener('click', function (ev) { ev.preventDefault(); navigator.share({ files: [file], title: 'Decor Quote - ' + info.name }).catch(function () {}); });
-          out.appendChild(sb); out.appendChild(document.createElement('br'));
+      var folder = folderName(info.name), qfile = safeName(info.quote);
+      var clientLink = QUOTE_BASE_URL + '/' + folder + '/' + qfile;
+      var msg = 'Please publish this quote to ivoryeventz-ops/ivory-packages as ' + folder + '/' + qfile + '.html (create the folder if it does not exist) and give me the client link. Client: ' + info.name + ', event date: ' + fmtDate(info.date) + ', quote #' + info.quote + '. Expected link: ' + clientLink;
+      var up = document.createElement('div');
+      var send = document.createElement('button');
+      send.type = 'button'; send.className = 'btn'; send.textContent = 'Send quote to Claude';
+      var sendMsg = document.createElement('p'); sendMsg.className = 'note'; sendMsg.setAttribute('role', 'status');
+      send.addEventListener('click', function () {
+        var file = null;
+        try { file = new File([html], folder + '-' + qfile + '.html', { type: 'text/html' }); } catch (e) {}
+        if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], text: msg, title: 'Decor Quote - ' + info.name }).then(function () {
+            sendMsg.textContent = 'Choose Claude in the share list. Once Claude replies it will give you the client link.';
+          }).catch(function () {});
+          return;
         }
-      } catch (e) {}
+        var a = document.createElement('a'); a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();
+        var finish = function (copied) {
+          sendMsg.textContent = (copied ? 'Message copied. ' : 'Copy the message shown below. ') + 'The quote file was downloaded. In Claude, paste the message and attach the downloaded file (' + fname + ').';
+          if (!copied) { var ta = document.createElement('textarea'); ta.readOnly = true; ta.value = msg; ta.rows = 5; ta.style.width = '100%'; sendMsg.appendChild(ta); }
+          window.open(CLAUDE_CHAT_URL, '_blank');
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(msg).then(function () { finish(true); }, function () { finish(false); });
+        else finish(false);
+      });
+      var linkP = document.createElement('p'); linkP.className = 'note'; linkP.textContent = 'Client link after publishing: ' + clientLink;
+      up.appendChild(send); up.appendChild(sendMsg); up.appendChild(linkP); out.appendChild(up);
     });
   });
 
