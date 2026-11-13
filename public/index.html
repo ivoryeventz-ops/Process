@@ -1180,8 +1180,19 @@ input[type=number] { font: inherit; }
       <div class="qty" id="roundTableQtyBox">
         <label for="roundTableQty" style="font-weight: 600; font-size: 0.85rem; margin-bottom: 3px;">Number of tables (Min: 6):</label>
         Qty <input type="number" id="roundTableQty" min="6" value="6" class="qty-input" inputmode="numeric" aria-label="Number of round tables">
+        <div style="margin-top:8px;">Tiffany chairs <input type="number" id="roundTableChairs" min="0" value="36" class="chair-input" inputmode="numeric" aria-label="Number of Tiffany chairs (0 for none)"><span class="rate-wrap">Rate &#8377; <input type="number" id="roundChairRate" min="0" value="75" class="rate-input" inputmode="numeric" aria-label="Rate per Tiffany chair"></span></div>
+        <div style="margin-top:8px;">Table rate &#8377; <input type="number" id="roundTableRate" min="0" value="2700" class="rate-input" inputmode="numeric" aria-label="Rate per table (without chairs)"> <small>(covers + centrepiece, chairs extra)</small></div>
         <span class="calc-subnote" id="roundTableBreakdown">&#10003; 6 round tables + 36 Tiffany chairs</span>
       </div>
+    </div>
+    <div class="item">
+      <label>
+        <input type="checkbox" data-name="Tiffany chairs - Theatre style" data-price="75" data-rate-editable="true">
+        <b>Tiffany chairs &ndash; Theatre style</b>
+        <small>Tiffany chairs in rows, theatre-style seating</small>
+        <span class="price">&#8377;75 / chair (editable)</span>
+      </label>
+      <div class="qty">Chairs <input type="number" min="1" value="100" class="qty-input" inputmode="numeric" aria-label="Number of theatre-style chairs"><span class="rate-wrap">Rate &#8377; <input type="number" min="0" value="75" class="rate-input" inputmode="numeric" aria-label="Rate per theatre-style chair"></span></div>
     </div>
   </div>
 
@@ -1245,16 +1256,34 @@ input[type=number] { font: inherit; }
   </div>
 
   <h2>11 &middot; Wedding cars</h2>
-  <p class="sub">Includes driver, fuel for 80 km / 8 hours</p>
+  <p class="sub">Includes driver, fuel for 80 km / 8 hours. Tick each car needed and set the number.</p>
   <div class="grid">
     <div class="item">
       <label>
-        <input type="checkbox" data-name="Mercedes E / BMW 5 / Audi A6" data-price="10500">
-        <b>Mercedes E / BMW 5 / Audi A6</b>
-        <small>White luxury sedan (BMW also available in dark green)</small>
+        <input type="checkbox" data-name="Mercedes Benz E" data-price="10500">
+        <b>Mercedes Benz E</b>
+        <small>White luxury sedan</small>
         <span class="price">&#8377;10,500</span>
       </label>
-      <div class="qty">Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
+      <div class="qty">Cars <input type="number" min="1" value="1" class="qty-input" inputmode="numeric" aria-label="Number of cars"> &nbsp;Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
+    </div>
+    <div class="item">
+      <label>
+        <input type="checkbox" data-name="Audi A6" data-price="10500">
+        <b>Audi A6</b>
+        <small>White luxury sedan</small>
+        <span class="price">&#8377;10,500</span>
+      </label>
+      <div class="qty">Cars <input type="number" min="1" value="1" class="qty-input" inputmode="numeric" aria-label="Number of cars"> &nbsp;Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
+    </div>
+    <div class="item">
+      <label>
+        <input type="checkbox" data-name="BMW 5" data-price="10500">
+        <b>BMW 5</b>
+        <small>White luxury sedan (also available in dark green)</small>
+        <span class="price">&#8377;10,500</span>
+      </label>
+      <div class="qty">Cars <input type="number" min="1" value="1" class="qty-input" inputmode="numeric" aria-label="Number of cars"> &nbsp;Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
     </div>
     <div class="item">
       <label>
@@ -1263,7 +1292,7 @@ input[type=number] { font: inherit; }
         <small>White luxury sedan</small>
         <span class="price">&#8377;12,500</span>
       </label>
-      <div class="qty">Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
+      <div class="qty">Cars <input type="number" min="1" value="1" class="qty-input" inputmode="numeric" aria-label="Number of cars"> &nbsp;Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
     </div>
     <div class="item">
       <label>
@@ -1272,7 +1301,7 @@ input[type=number] { font: inherit; }
         <small>White latest model sedan</small>
         <span class="price">&#8377;18,500</span>
       </label>
-      <div class="qty">Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
+      <div class="qty">Cars <input type="number" min="1" value="1" class="qty-input" inputmode="numeric" aria-label="Number of cars"> &nbsp;Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
     </div>
     <div class="item">
       <label>
@@ -1281,7 +1310,7 @@ input[type=number] { font: inherit; }
         <small>White flagship VIP sedan</small>
         <span class="price">&#8377;20,500</span>
       </label>
-      <div class="qty">Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
+      <div class="qty">Cars <input type="number" min="1" value="1" class="qty-input" inputmode="numeric" aria-label="Number of cars"> &nbsp;Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
     </div>
     <div class="item">
       <label>
@@ -1290,7 +1319,7 @@ input[type=number] { font: inherit; }
         <small>Black or white luxury SUV</small>
         <span class="price">&#8377;45,000</span>
       </label>
-      <div class="qty">Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
+      <div class="qty">Cars <input type="number" min="1" value="1" class="qty-input" inputmode="numeric" aria-label="Number of cars"> &nbsp;Car for <select class="who-select" aria-label="Groom or bride"><option value="">Select</option><option value="Groom">Groom</option><option value="Bride">Bride</option></select></div>
     </div>
   </div>
 
@@ -1300,9 +1329,9 @@ input[type=number] { font: inherit; }
   <div class="grid">
     <div class="item">
       <label>
-        <input type="checkbox" data-name="Generator" data-price="8000">
+        <input type="checkbox" data-name="Generator" data-price="8000" checked>
         <b>Generator</b>
-        <small>Dedicated generator for stage sound and lighting</small>
+        <small>Dedicated generator for stage sound and lighting (included by default &ndash; untick if not required)</small>
         <span class="price">&#8377;8,000</span>
       </label>
     </div>
@@ -1710,7 +1739,7 @@ input[type=number] { font: inherit; }
   var CLAUDE_CHAT_URL = "https://claude.ai/new";   // paste the link of your Ivory Events chat with Claude here so "Send quote" opens that chat
   // -----------------------------------------------------------------------
   var RT_MIN_TABLES = 6;
-  var RT_RATE_PER_TABLE = 3150;
+  var RT_RATE_PER_TABLE = 3150;   // legacy (6 chairs included); now split into table rate + chair rate inputs
   var SEC_GROUP = {1:'decor',2:'decor',3:'decor',4:'decor',5:'decor',6:'decor',7:'decor',8:'decor',
                    9:'vendor',10:'vendor',11:'vendor',12:'vendor',13:'vendor',14:'vendor',15:'decor',16:'bridecar'};
   var lastCheckedRadio = {};
@@ -1753,15 +1782,24 @@ input[type=number] { font: inherit; }
       var row;
 
       if (input.getAttribute('data-is-round-table') === 'true') {
-        var n = getQty(card), chairs = n * 6, sub = n * RT_RATE_PER_TABLE;
+        var n = getQty(card);
+        var chairEl = document.getElementById('roundTableChairs');
+        var chairs = parseInt(chairEl.value, 10);
+        if (isNaN(chairs) || chairs < 0) chairs = 0;
+        if (chairs > 9999) chairs = 9999;
+        var tRate = parseFloat(document.getElementById('roundTableRate').value); if (isNaN(tRate) || tRate < 0) tRate = 0;
+        var cRate = parseFloat(document.getElementById('roundChairRate').value); if (isNaN(cRate) || cRate < 0) cRate = 0;
+        var sub = n * tRate + chairs * cRate;
+        var chairTxt = chairs > 0 ? chairs + " Tiffany chairs" : "no chairs";
         var descEl = document.getElementById('roundTableDesc');
         var priceEl = document.getElementById('roundTablePriceLabel');
         var brEl = document.getElementById('roundTableBreakdown');
-        if (descEl) descEl.textContent = n + " round tables with covers, centerpieces, and " + chairs + " Tiffany chairs.";
+        if (descEl) descEl.textContent = n + " round tables with covers, centerpieces" + (chairs > 0 ? ", and " + chairs + " Tiffany chairs." : " (no chairs).");
         if (priceEl) priceEl.textContent = formatMoney(sub);
-        if (brEl) brEl.textContent = "✓ " + n + " round tables + " + chairs + " Tiffany chairs";
-        row = { name: "Round tables in hall", label: "Round tables (" + n + " tables + " + chairs + " Tiffany chairs)",
-                qty: n, rate: RT_RATE_PER_TABLE, sub: sub, hasQty: true, sublist: ["Tiffany chairs - " + chairs + " No.s", "Table covers and centrepieces"] };
+        if (brEl) brEl.textContent = "✓ " + n + " round tables + " + chairTxt;
+        row = { name: "Round tables in hall", label: "Round tables (" + n + " tables" + (chairs > 0 ? " + " + chairs + " Tiffany chairs" : "") + ")",
+                qty: n, rate: tRate, sub: sub, hasQty: true, hasQtyShown: true, sheetQty: 1, sheetRate: sub,
+                sublist: (chairs > 0 ? ["Tiffany chairs - " + chairs + " No.s"] : []).concat(["Table covers and centrepieces"]) };
       } else {
         var qty = getQty(card), rate = getRate(input, card);
         var name = input.getAttribute('data-name');
@@ -1840,6 +1878,18 @@ input[type=number] { font: inherit; }
   });
   each(document.querySelectorAll('input[type="checkbox"]'), function (cb) { cb.addEventListener('change', render); });
   each(document.querySelectorAll('.who-select'), function (sel) { sel.addEventListener('change', render); });
+  (function () {
+    var tq = document.getElementById('roundTableQty'), ch = document.getElementById('roundTableChairs');
+    var touched = false;
+    ch.addEventListener('input', function () { touched = true; render(); });
+    ch.addEventListener('change', function () {
+      var v = parseInt(ch.value, 10);
+      if (isNaN(v) || v < 0) v = 0;
+      ch.value = v; touched = true; render();
+    });
+    tq.addEventListener('input', function () { if (!touched) { ch.value = getQty(tq.closest('.item')) * 6; } });
+    tq.addEventListener('change', function () { if (!touched) { ch.value = getQty(tq.closest('.item')) * 6; render(); } });
+  })();
   each(document.querySelectorAll('.qty-input, .rate-input'), function (q) {
     q.addEventListener('input', render);
     q.addEventListener('change', function () {
@@ -2105,7 +2155,7 @@ input[type=number] { font: inherit; }
       var first = R.length + 1;
       rows.forEach(function (r) {
         var n = R.length + 1;
-        R.push([label, r.label || r.name, r.qty, r.rate, '=C' + n + '*D' + n]);
+        R.push([label, r.label || r.name, r.sheetQty || r.qty, r.sheetRate !== undefined ? r.sheetRate : r.rate, '=C' + n + '*D' + n]);
       });
       var last = R.length, t = R.length + 1;
       R.push(['', totalLabel, '', '', '=SUM(E' + first + ':E' + last + ')']);
