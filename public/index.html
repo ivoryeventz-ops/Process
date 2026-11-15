@@ -700,6 +700,11 @@ input:focus, textarea:focus { outline: none; border-color: var(--gold); backgrou
 .divider { border: 0; border-top: 1px solid var(--line); margin: 14px 0 8px; }
 .field-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute); font-weight: 600; margin: 8px 0 0; display: block; }
 input[type=number] { font: inherit; }
+.intro-wrap { max-width: var(--w); margin: 0 auto; padding: 1.5rem 1rem 0; }
+.intro-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem; box-shadow: 0 6px 22px rgba(60, 45, 20, 0.06); }
+.intro-card h3 { font-family: var(--serif); margin: 0 0 0.5rem; color: var(--ink); font-size: 1.6rem; font-weight: 600; }
+.intro-fields { display: grid; gap: 0 1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 8px; }
+.intro-card .btn { margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -710,6 +715,29 @@ input[type=number] { font: inherit; }
   <p>Tick the items &mdash; the total updates as you go, then create the client quote</p>
   <div class="orn" aria-hidden="true">&#10022;</div>
 </header>
+
+<div class="intro-wrap">
+  <section class="intro-card" aria-labelledby="introH">
+    <h3 id="introH">Client intro link</h3>
+    <p class="note" style="margin-top:0">New enquiry: fill name, date and venue, then send the intro link (Intro, Packages, Checklist) to the client. Quotes you publish below are added to that same link as new tabs.</p>
+    <div class="intro-fields">
+      <div>
+        <label class="field-label" for="nm">Client name</label>
+        <input type="text" id="nm" placeholder="e.g. Rebecca" autocomplete="off">
+      </div>
+      <div>
+        <label class="field-label" for="dt">Date of event</label>
+        <input type="date" id="dt">
+      </div>
+      <div>
+        <label class="field-label" for="vn">Venue</label>
+        <input type="text" id="vn" placeholder="Church / hall and location" autocomplete="off">
+      </div>
+    </div>
+    <button type="button" class="btn secondary" id="mkIntro">Create client intro link</button>
+    <div class="out" id="introOut" role="status"></div>
+  </section>
+</div>
 
 <main>
 <div>
@@ -1411,16 +1439,6 @@ input[type=number] { font: inherit; }
   <div class="total"><span>Estimated total</span><span id="tot">&#8377;0</span></div>
   <p class="note" id="tanote"></p>
 
-  <hr class="divider">
-  <label class="field-label" for="nm">Client name</label>
-  <input type="text" id="nm" placeholder="e.g. Rebecca" autocomplete="off">
-  <label class="field-label" for="dt">Date of event</label>
-  <input type="date" id="dt">
-  <label class="field-label" for="vn">Venue</label>
-  <input type="text" id="vn" placeholder="Church / hall and location" autocomplete="off">
-  <button type="button" class="btn secondary" id="mkIntro">Create client intro link</button>
-  <p class="note">New enquiry: fill name, date and venue, then send the intro link (Intro, Packages, Checklist) to the client. Quotes you publish below are added to that same link as new tabs.</p>
-  <div class="out" id="introOut" role="status"></div>
   <hr class="divider">
   <label class="field-label" for="qn">Quote #</label>
   <input type="text" id="qn" placeholder="e.g. 261103" autocomplete="off">
