@@ -19,11 +19,19 @@ Sheets are created in the Drive of the account that deployed the script.
 
 ## Publishing quotes to clients (one tap)
 
-After **Create quote**, press **Publish quote & get client link**. The page saves the quote to `ivoryeventz-ops/ivory-packages` as `ClientName/YYMMDD.html` (spaces in names become hyphens) and shows the client link, e.g. `https://ivory-packages.pages.dev/Rebecca/261103`, with a **Send on WhatsApp** link. The link goes live about a minute later, after Cloudflare redeploys. If the same client/quote # already exists, it asks before replacing it.
+After **Create quote**, press **Publish quote & get client link**. The page saves the quote to `ivoryeventz-ops/ivory-packages` as `ClientName/YYMMDD.html` (spaces in names become hyphens), and also adds it as a new tab on the client's intro link (see below). The intro link is shown with a **Send on WhatsApp** link and goes live about a minute later, after Cloudflare redeploys. If the same client/quote # already exists, it asks before replacing it.
+
+## Client intro link (one link per client)
+
+Fill **Client name**, **Date of event** and **Venue**, then press **Create client intro link**. This creates `New A/<ClientName>/` in `ivoryeventz-ops/Ivory-Events`, shown at `https://ivory-events.pages.dev/New%20A/<ClientName>/`, with the tabs Intro (intro, reviews, gallery on one scrolling page), Packages and Service Checklist. Send it to a new client on WhatsApp.
+
+When the client replies and you publish a quote for the same name and event date, the quote is saved to `New A/packages/<ClientName>/<quote #>.html` and added to the client's `data.json`. It then appears as a tab named by its creation date, newest first and opened first, on the same link, so the client never needs a second link. The quote # is the creation date (YYMMDD); two quotes on the same day get "(2)" style labels. If the client page does not exist yet, publishing a quote creates it. The same name with a different event date gets its own page (`Name-DDMMYY`).
+
+The page template is `New A/client-shell.html` in Ivory-Events (rebuilt by `New A/generate.py`); the app copies it, so design changes there need no app update.
 
 One-time setup on each phone/computer (the key is saved only in that browser, never in the code or the repo):
 1. On GitHub: profile picture → Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token.
-2. Name it "Ivory quote publisher", choose an expiry (up to 1 year), **Repository access: Only select repositories → ivory-packages**, **Permissions → Contents: Read and write**. Generate and copy the key (`github_pat_...`).
+2. Name it "Ivory quote publisher", choose an expiry (up to 1 year), **Repository access: Only select repositories → ivory-packages and Ivory-Events**, **Permissions → Contents: Read and write**. (Keys made earlier for ivory-packages only: open the token on GitHub and add Ivory-Events under Repository access.) Generate and copy the key (`github_pat_...`).
 3. In the app, open **Publishing key** (bottom of the sidebar), paste the key and press **Save key**.
 
 When the key expires, GitHub rejects it and the page says so; create a new one and save it again. To stop a device publishing, press **Remove key**, or delete the token on GitHub (this stops every device).
