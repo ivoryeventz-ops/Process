@@ -14,10 +14,26 @@
 <link rel="manifest" href="manifest.webmanifest">
 <style>
   html,body{margin:0;height:100%;background:#6e1f2f;overflow:hidden}
-  iframe{border:0;width:100%;height:100%;display:block}
+  iframe{border:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .35s}
+  iframe.ready{opacity:1}
+  #splash{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:linear-gradient(180deg,#6e1f2f,#521622);color:#fff;font-family:Georgia,serif;transition:opacity .35s}
+  #splash.gone{opacity:0;pointer-events:none}
+  #splash img{width:96px;height:96px;border-radius:50%;box-shadow:0 0 0 3px rgba(255,255,255,.3)}
+  #splash b{font-size:30px;letter-spacing:.3px}
+  #splash i{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#efe3c8;animation:sp .9s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
+<div id="splash"><img src="https://ivory-packages.pages.dev/ivory-logo.jpg" alt=""><b>Ivory Events</b><i></i></div>
 <iframe id="app" src="https://script.google.com/macros/s/AKfycbxOKV2EYLV25K4PUvlLm_gok4NdjlapguoQRGLQZRSwEyz_yBvpC0gR1-HcvAz4NXCb/exec" title="Ivory Hub" allow="clipboard-read; clipboard-write"></iframe>
+<script>
+  (function () {
+    var f = document.getElementById('app'), s = document.getElementById('splash');
+    function show() { f.classList.add('ready'); s.classList.add('gone'); setTimeout(function () { s.remove(); }, 500); }
+    f.addEventListener('load', function () { setTimeout(show, 250); });
+    setTimeout(show, 12000);   // never leave the splash stuck
+  })();
+</script>
 </body>
 </html>
