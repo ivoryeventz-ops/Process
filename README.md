@@ -37,3 +37,7 @@ One-time setup on each phone/computer (the key is saved only in that browser, ne
 When the key expires, GitHub rejects it and the page says so; create a new one and save it again. To stop a device publishing, press **Remove key**, or delete the token on GitHub (this stops every device).
 
 "Or send quote to Claude" remains as a fallback and prepares the file and a message for Claude.
+
+## Push notifications (reminders on iPhone)
+
+`src/worker.js` is a Cloudflare Worker that keeps each phone's subscription in KV and sends one morning digest of what is due (read from the Apps Script app: `?push=due&key=...`). Setup steps: see `PUSH-SETUP.md`.
