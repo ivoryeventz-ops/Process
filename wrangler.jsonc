@@ -1,5 +1,18 @@
 {
   "name": "process",
+  "main": "src/worker.js",
   "compatibility_date": "2026-11-01",
-  "assets": { "directory": "./public" }
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "kv_namespaces": [
+    { "binding": "SUBS", "id": "81aab5ff762645eda8408782c5f4f185" }
+  ],
+  "triggers": { "crons": ["0 3 * * *"] },
+  "vars": {
+    "APPS_SCRIPT_URL": "https://script.google.com/macros/s/AKfycbxOKV2EYLV25K4PUvlLm_gok4NdjlapguoQRGLQZRSwEyz_yBvpC0gR1-HcvAz4NXCb/exec",
+    "VAPID_SUBJECT": "https://ivory-events.pages.dev"
+  }
 }

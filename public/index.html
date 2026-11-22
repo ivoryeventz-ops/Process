@@ -22,17 +22,86 @@
   #splash b{font-size:30px;letter-spacing:.3px}
   #splash i{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#efe3c8;animation:sp .9s linear infinite}
   @keyframes sp{to{transform:rotate(360deg)}}
+  #pn{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:3;display:none;gap:8px;align-items:center;flex-wrap:wrap;background:#6e1f2f;color:#fff;font:14px/1.35 -apple-system,system-ui,sans-serif;padding:10px 12px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+  #pn.on{display:flex}
+  #pn span{flex:1 1 150px}
+  #pn input{flex:1 1 120px;min-width:0;padding:8px;border:0;border-radius:8px;font-size:16px}
+  #pn button{border:0;border-radius:8px;padding:8px 12px;font-size:14px;background:#efe3c8;color:#521622}
+  #pn button.g{background:transparent;color:#efe3c8}
 </style>
 </head>
 <body>
 <div id="splash"><img src="https://ivory-packages.pages.dev/ivory-logo.jpg" alt=""><b>Ivory Events</b><i></i></div>
 <iframe id="app" src="https://script.google.com/macros/s/AKfycbxOKV2EYLV25K4PUvlLm_gok4NdjlapguoQRGLQZRSwEyz_yBvpC0gR1-HcvAz4NXCb/exec" title="Ivory Hub" allow="clipboard-read; clipboard-write"></iframe>
+<div id="pn"><span id="pnt"></span><input id="pnk" type="password" placeholder="Notification key" autocomplete="off" style="display:none"><button id="pnb" type="button"></button><button id="pnn" class="g" type="button">Not now</button></div>
 <script>
   (function () {
     var f = document.getElementById('app'), s = document.getElementById('splash');
     function show() { f.classList.add('ready'); s.classList.add('gone'); setTimeout(function () { s.remove(); }, 500); }
     f.addEventListener('load', function () { setTimeout(show, 250); });
     setTimeout(show, 12000);   // never leave the splash stuck
+  })();
+
+  /* ---------- push notifications: a small bar offers to turn them on (iPhone: only from the Home Screen icon) ---------- */
+  (function () {
+    var bar = document.getElementById('pn'), txt = document.getElementById('pnt'), key = document.getElementById('pnk'),
+        go = document.getElementById('pnb'), no = document.getElementById('pnn');
+    var force = /[?&]notify\b/.test(location.search);
+    var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    var standalone = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+    var supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+    var K = 'ivoryPushKey', D = 'ivoryPushHide';
+    function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    function say(t, ask, label) { txt.textContent = t; key.style.display = ask ? '' : 'none'; go.textContent = label || ''; go.style.display = label ? '' : 'none'; bar.classList.add('on'); }
+    function hide() { bar.classList.remove('on'); }
+    function b64(s) { s = (s + '==='.slice((s.length + 3) % 4)).replace(/-/g, '+').replace(/_/g, '/'); var r = atob(s), o = new Uint8Array(r.length); for (var i = 0; i < r.length; i++) o[i] = r.charCodeAt(i); return o; }
+    function api(path, body) {
+      return fetch('/api/' + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
+        .then(function (r) { return r.json().then(function (j) { j.status = r.status; return j; }); });
+    }
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+
+    if (!supported) {
+      if (ios && !standalone && !(Date.now() - Number(get(D) || 0) < 3 * 864e5)) say('For reminders: tap Share, then Add to Home Screen, and open Ivory from that icon.', false, '');
+      return;
+    }
+    function enable() {
+      var k = get(K) || key.value.trim();
+      if (!k) { say('Type the notification key first.', true, 'Turn on'); return; }
+      go.disabled = true;
+      Notification.requestPermission().then(function (perm) {
+        if (perm !== 'granted') throw new Error('Notifications are blocked. Turn them on for Ivory in iPhone Settings, then try again.');
+        return navigator.serviceWorker.ready;
+      }).then(function (reg) {
+        return fetch('/api/vapid').then(function (r) { return r.json(); }).then(function (v) {
+          return reg.pushManager.getSubscription().then(function (old) {
+            return old || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(v.key) });
+          });
+        });
+      }).then(function (sub) {
+        return api('subscribe', { key: k, sub: sub.toJSON() });
+      }).then(function (r) {
+        go.disabled = false;
+        if (r.status === 401) { try { localStorage.removeItem(K); } catch (e) {} key.value = ''; say('That key is not right. Try again.', true, 'Turn on'); return; }
+        if (!r.ok) throw new Error(r.error || 'Could not turn on reminders');
+        set(K, k); say('Reminders are on for this phone.', false, ''); setTimeout(hide, 2500);
+      }).catch(function (err) { go.disabled = false; say(String(err.message || err), !get(K), 'Try again'); });
+    }
+    go.addEventListener('click', enable);
+    no.addEventListener('click', function () { set(D, String(Date.now())); hide(); });
+
+    navigator.serviceWorker.ready.then(function (reg) { return reg.pushManager.getSubscription(); }).then(function (sub) {
+      var saved = get(K);
+      if (sub && Notification.permission === 'granted') {
+        if (saved) api('subscribe', { key: saved, sub: sub.toJSON(), quiet: true }).catch(function () {});   // keeps this phone listed
+        if (force) say('Reminders are on for this phone.', false, '');
+        return;
+      }
+      if (!force && Date.now() - Number(get(D) || 0) < 3 * 864e5) return;
+      if (Notification.permission === 'denied') return;
+      say('Get a morning reminder when something is due.', !saved, 'Turn on');
+    }).catch(function () {});
   })();
 </script>
 </body>
