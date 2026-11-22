@@ -8,7 +8,7 @@ Nothing below changes your live hub until step 4. All the new files are on the b
 
 ## 1. Cloudflare (once)
 1. Cloudflare dashboard > Storage and databases > KV > Create a namespace, name it `ivory-push`. Copy its ID.
-2. Open `wrangler.jsonc` on the `push-notifications` branch in `Process` and replace `PASTE_KV_NAMESPACE_ID_HERE` with that ID (or send me the ID and I will do it).
+2. Open `wrangler.jsonc` on the `push-notifications` branch in `Process` and paste that ID in place of the placeholder (already done on the branch if you sent it to Claude).
 3. Make up a long password (only you two need to know it). This is the notification key. Keep it handy.
 4. Cloudflare > Workers and Pages > `process` > Settings > Variables and secrets > Add > type **Secret**, name `PUSH_KEY`, value = your password.
 

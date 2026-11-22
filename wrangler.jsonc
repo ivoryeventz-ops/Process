@@ -8,7 +8,7 @@
     "run_worker_first": ["/api/*"]
   },
   "kv_namespaces": [
-    { "binding": "SUBS", "id": "PASTE_KV_NAMESPACE_ID_HERE" }
+    { "binding": "SUBS", "id": "81aab5ff762645eda8408782c5f4f185" }
   ],
   "triggers": { "crons": ["0 3 * * *"] },
   "vars": {
